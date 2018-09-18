@@ -1,0 +1,184 @@
+---
+title: "FiveThirtyEight Data"
+author: "Adeel Abbasi"
+date: "September 17, 2018"
+output: html_document
+---
+
+
+## Github Cloning Step Question # 1
+
+### Step 1 - Create a directory
+```{r}
+# mkdir Caesar
+```
+
+### Step 2 - Navigate
+```{r}
+# cd Caesar
+```
+
+### Step 3 - Clone a directory 
+```{r}
+# git clone https://github.com/caesar0301/awesome-public-datasets
+```
+
+## Data  - Question # 2
+
+### Step A
+
+In R, please read in titanic.csv via either read.table() or read.csv(), assigning it to df.  This dataset follows the passengers aboard the Titanic, including their fees paid, rooms rented, and survivorship status.
+
+#### Read the file
+a.	In R, please read in titanic.csv via either read.table() or read.csv(), assigning it to df.  This dataset follows the passengers aboard the Titanic, including their fees paid, rooms rented, and survivorship status
+
+```{r}
+
+url <- "awesome-public-datasets/Datasets/titanic.csv"
+df = read.csv(file = url)
+
+
+```
+
+#### Count the male and feamle in the dataframe
+
+```{r}
+
+summary(df$Sex)
+
+```
+
+#### Generating a frequency of male/female
+b. Output the respective count of females and males aboard the Titanic. Plot the frequency of females and males.  Be sure to give an accurate title and label the axes.
+
+```{r}
+
+plot(df$Sex, ylab = 'Frequency', main = 'Titanic Data' )
+
+```
+
+### Find mean for Age, Fare and Survived
+c.	Please use one apply function (to review: swirl() modules 11, 12) to output the means of Age, Fare, and Survival.  Make sure the output is a real number for all three means.
+
+```{r}
+sapply(df[, c('Age', 'Fare', 'Survived')], function(x) round(mean(x, na.rm = TRUE), 2))
+# sapply(df[, c('Age', 'Fare', 'Survived')], function(x) mean(x, na.rm = TRUE))
+# sapply(df[, c('Age', 'Fare', 'Survived')], mean, na.rm = TRUE)
+
+
+```
+
+## Function Building - Question # 3
+
+```{r}
+
+helper.loaddata <- function(filepath){
+  sleepdata = read.csv(filepath)
+    
+  Age.Median <- median(sleepdata$Age, na.rm = TRUE)
+  Sleep.Minimum <- min(sleepdata$Duration, na.rm = TRUE)
+  Sleep.Maximum <- max(sleepdata$Duration, na.rm = TRUE)
+  RSES.Mean <- mean(sleepdata$RSES, na.rm = TRUE)
+  RSES.SD <- sd(sleepdata$RSES, na.rm = TRUE)
+  
+  report <- data.frame(Age.Median / 5, RSES.Mean/5, RSES.SD/5,
+              Sleep.Maximum - Sleep.Minimum)
+  
+  colnames(report) <- c('MedianAge', 'SelfEsteem', 'SE_SD', 'DurationRange')
+  report <- round(report, 2)
+  
+  report
+}
+
+url <- 'sleep_data_01.csv'
+sleepdata = helper.loaddata(url)
+sleepdata
+
+
+```
+
+
+### FiveThirtyEight Data - Question # 4
+
+```{r}
+# load the fivethirdyeight dataset collection
+library("fivethirtyeight")
+
+# load the package into a variable to find a dataset name
+pkg <- data(package = "fivethirtyeight")
+
+# identify the 22nd dataset name
+dataset.name <- pkg$results[22, "Item"]
+
+# print the datasetname 
+paste("22nd Dataset name is", dataset.name)
+
+#get the URL of the article 
+datasets <- read.csv("https://goo.gl/OT8iHa")
+
+url = subset(datasets, DATAFRAME_NAME==dataset.name)
+paste('News Story URL is', url$ARTICLE_URL)
+
+```
+
+#### Dimensions of the data frame
+```{r}
+# hold the dataset into a df variable
+df <- get(dataset.name)
+
+dim(df)
+
+```
+
+#### columns name of the data frame
+```{r}
+names(df)
+
+```
+
+#### Get Columns names count of the cols - Question # 5
+```{r}
+
+# Column names 
+colnames(df)
+
+# Number of columns
+dim(df)[2]
+
+
+```
+
+#### Generate a count of each unique major_category 
+```{r}
+
+library("sqldf")
+major_count <- sqldf("SELECT major_category,COUNT(*) as num_major_category FROM df GROUP BY major_category")
+
+names(major_count) <- c('Major Category', 'Count')
+major_count
+
+```
+
+#### barplot of major_count
+```{r}
+par(las=2)
+
+major_count <- table(df[,'major_category'])
+
+barplot(major_count, main = 'Major Categories', xlab = 'Frequency', col = heat.colors(12), density = 99, border = "dark blue", horiz = TRUE, space = 0.2)
+
+```
+
+
+#### Write data to CSV without header
+```{r}
+
+write.csv(df, file = 'fivethirtyeight.csv', row.names = FALSE)
+
+
+```
+
+#### Question # 6
+
+https://github.com/AdeelAbbasi/SMUMSDShomeworkAssignment3
+
